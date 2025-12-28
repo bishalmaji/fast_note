@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fast_note/models/note.dart';
 import 'package:fast_note/services/hive_service.dart';
-import 'package:fast_note/theme/app_theme.dart';
+import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 
 class NoteEditorScreen extends StatefulWidget {
@@ -19,6 +19,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   late bool _isPinned;
   String? _selectedColorHex;
   bool _hasChanges = false;
+  late FocusNode _titleFocusNode;
+  late FocusNode _contentFocusNode;
+  bool _isShiftPressed = false;
 
   final List<Color> _colorOptions = [
     const Color(0xFFFFFFA0), // Light Yellow
@@ -31,16 +34,52 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     const Color(0xFF98FB98), // Pale Green
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    _titleController = TextEditingController(text: widget.note?.title ?? '');
-    _contentController = TextEditingController(text: widget.note?.content ?? '');
-    _isPinned = widget.note?.isPinned ?? false;
-    _selectedColorHex = widget.note?.colorHex;
-    
-    _titleController.addListener(_checkChanges);
-    _contentController.addListener(_checkChanges);
+@override
+void initState() {
+  super.initState();
+  _titleController = TextEditingController(text: widget.note?.title ?? '');
+  _contentController = TextEditingController(text: widget.note?.content ?? '');
+  _isPinned = widget.note?.isPinned ?? false;
+  _selectedColorHex = widget.note?.colorHex;
+  
+  _titleFocusNode = FocusNode();
+  _contentFocusNode = FocusNode();
+  
+  _titleFocusNode.addListener(() {
+    setState(() {}); 
+  });
+  
+  _contentFocusNode.addListener(() {
+    setState(() {}); 
+  });
+  
+  _titleController.addListener(_checkChanges);
+  _contentController.addListener(_checkChanges);
+  
+ 
+  HardwareKeyboard.instance.addHandler(_handleKeyEvent);
+ 
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _contentFocusNode.requestFocus();
+  });
+}
+  bool _handleKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.shiftLeft || 
+          event.logicalKey == LogicalKeyboardKey.shiftRight) {
+        setState(() {
+          _isShiftPressed = true;
+        });
+      }
+    } else if (event is KeyUpEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.shiftLeft || 
+          event.logicalKey == LogicalKeyboardKey.shiftRight) {
+        setState(() {
+          _isShiftPressed = false;
+        });
+      }
+    }
+    return false;
   }
 
   void _checkChanges() {
@@ -86,165 +125,322 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final backgroundColor = _selectedColorHex != null 
+        ? Color(int.parse('FF$_selectedColorHex', radix: 16))
+        : theme.colorScheme.background;
     
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Iconsax.arrow_left_2),
-          onPressed: () async {
-            if (_hasChanges) {
-              final shouldSave = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  backgroundColor: theme.colorScheme.surface,
-                  title: Text('Save Changes?', style: theme.textTheme.bodyLarge),
-                  content: Text('Do you want to save your changes?', style: theme.textTheme.bodyMedium),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Discard'),
+      backgroundColor: backgroundColor,
+    appBar: PreferredSize(
+  preferredSize: const Size.fromHeight(48),
+  child: SafeArea(
+    bottom: false,
+    child: Container(
+      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+    
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+        
+          _toolbarButton(
+            icon: Iconsax.arrow_left_2,
+            onTap: () async {
+   
+              if (_hasChanges) {
+                final shouldSave = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: theme.colorScheme.surface,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        _saveNote();
-                        Navigator.pop(context, true);
-                      },
-                      child: const Text('Save'),
-                    ),
-                  ],
-                ),
-              );
-              if (shouldSave == true) return;
-            }
-            Navigator.pop(context, false);
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(_isPinned ? Iconsax.bookmark: Iconsax.bookmark_2),
-            onPressed: () {
-              setState(() {
-                _isPinned = !_isPinned;
-                _checkChanges();
-              });
+                    title: Text('Save Changes?', style: theme.textTheme.titleMedium),
+                    content: Text('Do you want to save your changes?', style: theme.textTheme.bodyMedium),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        style: TextButton.styleFrom(
+                          foregroundColor: theme.colorScheme.onSurface,
+                        ),
+                        child: const Text('Discard'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          _saveNote();
+                          Navigator.pop(context, true);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          foregroundColor: theme.colorScheme.onPrimary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text('Save'),
+                      ),
+                    ],
+                  ),
+                );
+                if (shouldSave == true) return;
+              }
+              Navigator.pop(context, false);
+            
             },
+            theme: theme,
           ),
-          IconButton(
-            icon: const Icon(Iconsax.tick_circle),
-            onPressed: _saveNote,
+
+          const Spacer(),
+
+        
+          _toolbarButton(
+            icon: _isPinned
+                ? Icons.push_pin_rounded
+                : Icons.push_pin_outlined,
+            color: _isPinned ? Colors.amber : theme.colorScheme.onSurface,
+            onTap: () {
+              setState(() => _isPinned = !_isPinned);
+              _checkChanges();
+            },
+            theme: theme,
+          ),
+
+          const SizedBox(width: 8),
+
+        
+          _toolbarButton(
+            icon: Iconsax.tick_circle,
+            color: theme.colorScheme.primary,
+            onTap: _saveNote,
+            theme: theme,
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+    ),
+  ),
+),
+
+
+ body: Container(
+        margin: EdgeInsets.only(top: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: _titleController,
-              style: theme.textTheme.displayMedium,
-              decoration: InputDecoration(
-                hintText: 'Title (optional)',
-                hintStyle: theme.textTheme.displayMedium!.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.5),
-                ),
-                border: InputBorder.none,
+Container(
+  margin: const EdgeInsets.only(bottom: 16),
+  decoration: BoxDecoration(
+    color: theme.colorScheme.surface,
+    borderRadius: BorderRadius.circular(12),
+    border: Border.all(
+      color: _titleFocusNode.hasFocus
+        ? theme.colorScheme.primary
+        : theme.colorScheme.outline.withOpacity(0.2),
+      width: _titleFocusNode.hasFocus ? 2 : 1,
+    ),
+    boxShadow: _titleFocusNode.hasFocus
+      ? [
+          BoxShadow(
+            color: theme.colorScheme.primary.withOpacity(0.1),
+            blurRadius: 8,
+            spreadRadius: 2,
+            offset: const Offset(0, 2),
+          ),
+        ]
+      : null,
+  ),
+  child: Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    child: TextField(
+      controller: _titleController,
+      focusNode: _titleFocusNode,
+      style: theme.textTheme.titleLarge?.copyWith(
+        fontWeight: FontWeight.w600,
+        fontSize: 22,
+      ),
+      decoration: InputDecoration(
+        hintText: 'Title',
+        hintStyle: theme.textTheme.titleLarge?.copyWith(
+          color: theme.colorScheme.onSurface.withOpacity(0.4),
+          fontWeight: FontWeight.w400,
+          fontSize: 22,
+        ),
+        border: InputBorder.none,
+        focusedBorder: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        errorBorder: InputBorder.none,
+        disabledBorder: InputBorder.none,
+        contentPadding: EdgeInsets.zero,
+      ),
+      maxLines: 2,
+      textInputAction: TextInputAction.done,
+      onSubmitted: (value) {
+        if (value.trim().isNotEmpty) {
+          _saveNote();
+        }
+      },
+    ),
+  ),
+),
+
+Expanded(
+  child: Container(
+    constraints: const BoxConstraints(minHeight: 200),
+
+     decoration: BoxDecoration(
+    color: theme.colorScheme.surface,
+    borderRadius: BorderRadius.circular(12),
+    border: Border.all(
+      color: _contentFocusNode.hasFocus
+        ? theme.colorScheme.primary
+        : theme.colorScheme.outline.withOpacity(0.2),
+      width: _contentFocusNode.hasFocus ? 2 : 1,
+    ),
+    boxShadow: _contentFocusNode.hasFocus
+      ? [
+          BoxShadow(
+            color: theme.colorScheme.primary.withOpacity(0.1),
+            blurRadius: 8,
+            spreadRadius: 2,
+            offset: const Offset(0, 2),
+          ),
+        ]
+      : null,
+  ),
+ child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: TextField(
+        controller: _contentController,
+        focusNode: _contentFocusNode,
+        style: theme.textTheme.bodyLarge?.copyWith(
+          fontSize: 16,
+          height: 1.6,
+        ),
+        decoration: InputDecoration(
+          hintText: 'Start typing your note...',
+          hintStyle: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.onSurface.withOpacity(0.4),
+            fontSize: 16,
+            height: 1.6,
+          ),
+          border: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+        ),
+        maxLines: null,
+        expands: true,
+        keyboardType: TextInputType.multiline,
+        textInputAction: TextInputAction.newline,
+        onSubmitted: (value) {
+          if (!_isShiftPressed && _contentController.text.trim().isNotEmpty) {
+            _titleFocusNode.requestFocus();
+          }
+        },
+      ),
+    ),
+  ),
+),
+            const SizedBox(height: 20),
+            Text(
+              'Note Color',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
               ),
-              maxLines: 2,
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: TextField(
-                controller: _contentController,
-                style: theme.textTheme.bodyLarge,
-                decoration: InputDecoration(
-                  hintText: 'Start typing...',
-                  hintStyle: theme.textTheme.bodyLarge!.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.5),
-                  ),
-                  border: InputBorder.none,
-                ),
-                maxLines: null,
-                keyboardType: TextInputType.multiline,
-              ),
-            ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             SizedBox(
-              height: 48,
+              height: 56,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: _colorOptions.length + 1,
-                separatorBuilder: (context, index) => const SizedBox(width: 8),
+                separatorBuilder: (context, index) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
                   if (index == 0) {
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedColorHex = null;
-                          _checkChanges();
-                        });
-                      },
-                      child: Container(
-                        width: 48,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surface,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: _selectedColorHex == null
-                                ? theme.colorScheme.primary
-                                : theme.colorScheme.outline.withOpacity(0.3),
-                            width: _selectedColorHex == null ? 2 : 1,
-                          ),
-                        ),
-                        child: Icon(Iconsax.color_swatch, color: theme.colorScheme.primary),
-                      ),
+                    return _buildColorOption(
+                      color: theme.colorScheme.surface,
+                      isSelected: _selectedColorHex == null,
+                      isDefault: true,
+                      theme: theme,
                     );
                   }
                   
                   final color = _colorOptions[index - 1];
                   final colorHex = color.value.toRadixString(16).substring(2);
                   
-                  return GestureDetector(
+                  return _buildColorOption(
+                    color: color,
+                    isSelected: _selectedColorHex == colorHex,
+                    theme: theme,
                     onTap: () {
                       setState(() {
                         _selectedColorHex = colorHex;
                         _checkChanges();
                       });
                     },
-                    child: Container(
-                      width: 48,
-                      decoration: BoxDecoration(
-                        color: color,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: _selectedColorHex == colorHex
-                              ? theme.colorScheme.primary
-                              : Colors.transparent,
-                          width: _selectedColorHex == colorHex ? 2 : 0,
-                        ),
-                        boxShadow: _selectedColorHex == colorHex
-                            ? [
-                                BoxShadow(
-                                  color: theme.colorScheme.primary.withOpacity(0.3),
-                                  blurRadius: 4,
-                                  spreadRadius: 1,
-                                ),
-                              ]
-                            : null,
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Iconsax.color_swatch,
-                          color: _getTextColor(color),
-                        ),
-                      ),
-                    ),
                   );
                 },
               ),
             ),
-          const SizedBox(height: 20,),
+            
+            const SizedBox(height: 24),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColorOption({
+    required Color color,
+    required bool isSelected,
+    required ThemeData theme,
+    bool isDefault = false,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap ?? () {
+        setState(() {
+          _selectedColorHex = null;
+          _checkChanges();
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 56,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected
+                ? theme.colorScheme.primary
+                : theme.colorScheme.outline.withOpacity(0.3),
+            width: isSelected ? 3 : 1.5,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: theme.colorScheme.primary.withOpacity(0.3),
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                  ),
+                ]
+              : null,
+        ),
+        child: Center(
+          child: isDefault
+              ? Icon(
+                  Iconsax.color_swatch,
+                  color: theme.colorScheme.primary,
+                  size: 24,
+                )
+              : Icon(
+                  Iconsax.color_swatch,
+                  color: _getTextColor(color),
+                  size: 24,
+                ),
         ),
       ),
     );
@@ -255,10 +451,41 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     return brightness > 0.5 ? Colors.black : Colors.white;
   }
 
+  Widget _toolbarButton({
+  required IconData icon,
+  required VoidCallback onTap,
+  required ThemeData theme,
+  Color? color,
+}) {
+  return SizedBox(
+    width: 48,
+    height: 48,
+    child: Material(
+      color: theme.colorScheme.surface.withOpacity(0.7),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Center(
+          child: Icon(
+            icon,
+            size: 22,
+            color: color ?? theme.colorScheme.onSurface,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+
   @override
   void dispose() {
     _titleController.dispose();
     _contentController.dispose();
+    _titleFocusNode.dispose();
+    _contentFocusNode.dispose();
+    HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
     super.dispose();
   }
 }

@@ -4,12 +4,33 @@ import 'package:fast_note/theme/app_theme.dart';
 
 class ThemeProvider extends ChangeNotifier {
   final String _themeBox = 'theme_preferences';
-  final String _themeKey = 'isDarkMode';
+  final String _themeKey = 'themeMode';
   
-  bool _isDarkMode = false;
-  bool get isDarkMode => _isDarkMode;
+  String _themeMode = 'light';
   
-  ThemeData get currentTheme => _isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme;
+  String get themeMode => _themeMode;
+  
+  bool get isDarkMode {
+    if (_themeMode == 'system') {
+      return false; 
+    }
+    return _themeMode == 'dark';
+  }
+  
+  ThemeData get currentTheme => _themeMode == 'dark' ? AppTheme.darkTheme : AppTheme.lightTheme;
+  
+  ThemeMode get materialThemeMode {
+    switch (_themeMode) {
+      case 'dark':
+        return ThemeMode.dark;
+      case 'light':
+        return ThemeMode.light;
+      case 'system':
+        return ThemeMode.system;
+      default:
+        return ThemeMode.light;
+    }
+  }
   
   ThemeProvider() {
     _loadThemePreference();
@@ -17,14 +38,28 @@ class ThemeProvider extends ChangeNotifier {
   
   Future<void> _loadThemePreference() async {
     final box = await Hive.openBox(_themeBox);
-    _isDarkMode = box.get(_themeKey, defaultValue: false) as bool;
+    _themeMode = box.get(_themeKey, defaultValue: 'light') as String;
     notifyListeners();
   }
   
   Future<void> toggleTheme() async {
-    _isDarkMode = !_isDarkMode;
+    if (_themeMode == 'light') {
+      _themeMode = 'dark';
+    } else if (_themeMode == 'dark') {
+      _themeMode = 'light';
+    } else {
+      _themeMode = 'light';
+    }
+    
     final box = await Hive.openBox(_themeBox);
-    await box.put(_themeKey, _isDarkMode);
+    await box.put(_themeKey, _themeMode);
+    notifyListeners();
+  }
+  
+  Future<void> setThemeMode(String themeMode) async {
+    _themeMode = themeMode;
+    final box = await Hive.openBox(_themeBox);
+    await box.put(_themeKey, _themeMode);
     notifyListeners();
   }
 }

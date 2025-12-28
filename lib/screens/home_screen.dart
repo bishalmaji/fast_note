@@ -1,3 +1,6 @@
+import 'package:fast_note/enums/sort_enums.dart';
+import 'package:fast_note/providers/settings_provider.dart';
+import 'package:fast_note/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fast_note/models/note.dart';
@@ -13,11 +16,8 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
- enum SortOption {
-    dateUpdated,
-    dateCreated,
-    title,
-  }
+
+
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Note> notes = [];
@@ -29,12 +29,14 @@ class _HomeScreenState extends State<HomeScreen> {
   final FocusNode _searchFocusNode = FocusNode();
   bool _isSearchFocused = false;
 
- 
-
   @override
   void initState() {
     super.initState();
     _loadNotes();
+    
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+    isGridView = settingsProvider.settings.defaultGridView;
+    currentSortOption = settingsProvider.settings.defaultSortOption;
     
     _searchFocusNode.addListener(() {
       setState(() {
@@ -55,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _sortNotes();
     _filterNotes();
   }
+
 
   void _sortNotes() {
     notes.sort((a, b) {
@@ -152,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Divider(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+              color: Colors.grey,
               height: 1,
             ),
             ...SortOption.values.map((option) {
@@ -164,9 +167,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isSelected 
+                        color: isSelected 
                         ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                        : Colors.grey,
                       width: 2,
                     ),
                   ),
@@ -219,14 +222,12 @@ class _HomeScreenState extends State<HomeScreen> {
         return 'Date Created';
       case SortOption.title:
         return 'Title (A-Z)';
-        default:
-        return 'Title (A-Z)';
-        
     }
   }
 
   void _showMenuOptions() {
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
     
     showModalBottomSheet(
       context: context,
@@ -238,34 +239,35 @@ class _HomeScreenState extends State<HomeScreen> {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 20,),
-              ListTile(
+            const SizedBox(height: 20),
+            ListTile(
               leading: Icon(
-                themeProvider.isDarkMode ? Iconsax.sun_1 : Iconsax.moon,
+                Iconsax.add,
                 color: Theme.of(context).colorScheme.primary,
               ),
               title: Text(
                 'Add Note',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              onTap: () async{
-                 Navigator.pop(context);
-                await Future.delayed(Duration(milliseconds: 300),(){});
+              onTap: () async {
+                Navigator.pop(context);
+                await Future.delayed(const Duration(milliseconds: 300));
                 _openNoteEditor(null);
               },
             ),
             ListTile(
               leading: Icon(
-                themeProvider.isDarkMode ? Iconsax.sun_1 : Iconsax.moon,
+                Iconsax.setting_2,
                 color: Theme.of(context).colorScheme.primary,
               ),
               title: Text(
-                themeProvider.isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+                'Settings',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              onTap: () {
-                themeProvider.toggleTheme();
+              onTap: () async {
                 Navigator.pop(context);
+                await Future.delayed(const Duration(milliseconds: 300));
+                _openSettings();
               },
             ),
             ListTile(
@@ -282,23 +284,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 _showAboutDialog();
               },
             ),
-            ListTile(
-              leading: Icon(
-                Iconsax.setting_2,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              title: Text(
-                'Settings',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
             const SizedBox(height: 16),
           ],
         );
       },
+    );
+  }
+
+  void _openSettings() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SettingsScreen(),
+      ),
     );
   }
 
@@ -344,6 +342,23 @@ class _HomeScreenState extends State<HomeScreen> {
           fontWeight: FontWeight.w600,
         )),
         actions: [
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              return IconButton(
+                icon: Icon(
+                  themeProvider.isDarkMode ? Iconsax.sun_1 : Iconsax.moon,
+                  color: theme.colorScheme.primary,
+                ),
+                onPressed: () {
+                  themeProvider.toggleTheme();
+                  final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+                  final settings = settingsProvider.settings;
+                  settings.themeMode = themeProvider.isDarkMode ? 'dark' : 'light';
+                  settingsProvider.updateSettings(settings);
+                },
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Iconsax.menu_1),
             onPressed: _showMenuOptions,
@@ -364,7 +379,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       border: Border.all(
                         color: _isSearchFocused 
                           ? theme.colorScheme.primary
-                          : theme.colorScheme.outline.withOpacity(0.2),
+                          : Colors.grey,
                         width: _isSearchFocused ? 2 : 1,
                       ),
                       boxShadow: _isSearchFocused
@@ -541,8 +556,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
           ),
-        
-        const SizedBox(height:42,),
+          const SizedBox(height: 42),
         ],
       ),
       floatingActionButton: FloatingActionButton(
