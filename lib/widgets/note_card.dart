@@ -19,20 +19,41 @@ class NoteCard extends StatelessWidget {
     this.onDeletePressed,
   });
 
+  Color _getNoteColor(BuildContext context) {
+    if (note.colorHex != null) {
+      return Color(int.parse('0xFF${note.colorHex!}'));
+    }
+    return Theme.of(context).colorScheme.surface;
+  }
+
+  Color _getTextColor(Color backgroundColor) {
+    final brightness = backgroundColor.computeLuminance();
+    return brightness > 0.5 ? Colors.black : Colors.white;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final noteColor = _getNoteColor(context);
+    final textColor = _getTextColor(noteColor);
+    final theme = Theme.of(context);
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: note.colorHex != null 
-            ? Color(int.parse('0xFF${note.colorHex!}')).withOpacity(0.1)
-            : AppTheme.surfaceColor,
+          color: noteColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: AppTheme.borderColor,
+            color: theme.colorScheme.outline.withOpacity(0.2),
             width: 1,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Stack(
           children: [
@@ -47,14 +68,15 @@ class NoteCard extends StatelessWidget {
                       child: Icon(
                         Icons.push_pin_rounded,
                         size: 16,
-                        color: AppTheme.primaryColor,
+                        color: textColor.withOpacity(0.7),
                       ),
                     ),
                   Text(
                     note.displayTitle,
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    style: theme.textTheme.bodyLarge!.copyWith(
                       fontWeight: FontWeight.w600,
                       fontSize: isGrid ? 14 : 16,
+                      color: textColor,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -63,8 +85,9 @@ class NoteCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       note.previewContent,
-                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      style: theme.textTheme.bodyMedium!.copyWith(
                         fontSize: isGrid ? 12 : 14,
+                        color: textColor.withOpacity(0.8),
                       ),
                       maxLines: isGrid ? 4 : 6,
                       overflow: TextOverflow.ellipsis,
@@ -73,9 +96,9 @@ class NoteCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     DateFormat('MMM dd, yyyy').format(note.updatedAt),
-                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                    style: theme.textTheme.bodySmall!.copyWith(
                       fontSize: 11,
-                      color: AppTheme.subtextColor,
+                      color: textColor.withOpacity(0.6),
                     ),
                   ),
                 ],
@@ -94,7 +117,7 @@ class NoteCard extends StatelessWidget {
                               ? Icons.push_pin_rounded
                               : Icons.push_pin_outlined,
                           size: 18,
-                          color: AppTheme.primaryColor,
+                          color: textColor,
                         ),
                         onPressed: onPinPressed,
                         padding: EdgeInsets.zero,
@@ -102,10 +125,10 @@ class NoteCard extends StatelessWidget {
                       ),
                     if (onDeletePressed != null)
                       IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.more_vert_rounded,
                           size: 18,
-                          color: AppTheme.subtextColor,
+                          color: textColor,
                         ),
                         onPressed: onDeletePressed,
                         padding: EdgeInsets.zero,

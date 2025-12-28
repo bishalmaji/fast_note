@@ -21,12 +21,14 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   bool _hasChanges = false;
 
   final List<Color> _colorOptions = [
-    AppTheme.primaryColor,
-    const Color(0xFF10B981), // Emerald
-    const Color(0xFFF59E0B), // Amber
-    const Color(0xFFEF4444), // Red
-    const Color(0xFF8B5CF6), // Violet
-    const Color(0xFFEC4899), // Pink
+    const Color(0xFFFFFFA0), // Light Yellow
+    const Color(0xFFFCA590), // Salmon Pink
+    const Color(0xFFCDEFF1), // Light Cyan
+    const Color(0xFFFEC871), // Light Orange
+    const Color(0xFFD8A7FF), // Light Purple
+    const Color(0xFFA0E7FF), // Light Blue
+    const Color(0xFFFFB6C1), // Light Pink
+    const Color(0xFF98FB98), // Pale Green
   ];
 
   @override
@@ -83,8 +85,10 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: theme.colorScheme.background,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Iconsax.arrow_left_2),
@@ -93,8 +97,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               final shouldSave = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: const Text('Save Changes?'),
-                  content: const Text('Do you want to save your changes?'),
+                  backgroundColor: theme.colorScheme.surface,
+                  title: Text('Save Changes?', style: theme.textTheme.bodyLarge),
+                  content: Text('Do you want to save your changes?', style: theme.textTheme.bodyMedium),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
@@ -117,7 +122,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
         ),
         actions: [
           IconButton(
-            icon: Icon(_isPinned ? Iconsax.paintbucket : Iconsax.paintbucket1),
+            icon: Icon(_isPinned ? Iconsax.bookmark: Iconsax.bookmark_2),
             onPressed: () {
               setState(() {
                 _isPinned = !_isPinned;
@@ -137,11 +142,11 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           children: [
             TextField(
               controller: _titleController,
-              style: Theme.of(context).textTheme.displayMedium,
+              style: theme.textTheme.displayMedium,
               decoration: InputDecoration(
                 hintText: 'Title (optional)',
-                hintStyle: Theme.of(context).textTheme.displayMedium!.copyWith(
-                  color: AppTheme.subtextColor,
+                hintStyle: theme.textTheme.displayMedium!.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.5),
                 ),
                 border: InputBorder.none,
               ),
@@ -151,11 +156,11 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
             Expanded(
               child: TextField(
                 controller: _contentController,
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: theme.textTheme.bodyLarge,
                 decoration: InputDecoration(
                   hintText: 'Start typing...',
-                  hintStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: AppTheme.subtextColor,
+                  hintStyle: theme.textTheme.bodyLarge!.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.5),
                   ),
                   border: InputBorder.none,
                 ),
@@ -182,16 +187,16 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       child: Container(
                         width: 48,
                         decoration: BoxDecoration(
-                          color: AppTheme.surfaceColor,
+                          color: theme.colorScheme.surface,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: _selectedColorHex == null
-                                ? AppTheme.primaryColor
-                                : AppTheme.borderColor,
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.outline.withOpacity(0.3),
                             width: _selectedColorHex == null ? 2 : 1,
                           ),
                         ),
-                        child: const Icon(Iconsax.color_swatch),
+                        child: Icon(Iconsax.color_swatch, color: theme.colorScheme.primary),
                       ),
                     );
                   }
@@ -209,19 +214,28 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                     child: Container(
                       width: 48,
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.2),
+                        color: color,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: _selectedColorHex == colorHex
-                              ? color
+                              ? theme.colorScheme.primary
                               : Colors.transparent,
                           width: _selectedColorHex == colorHex ? 2 : 0,
                         ),
+                        boxShadow: _selectedColorHex == colorHex
+                            ? [
+                                BoxShadow(
+                                  color: theme.colorScheme.primary.withOpacity(0.3),
+                                  blurRadius: 4,
+                                  spreadRadius: 1,
+                                ),
+                              ]
+                            : null,
                       ),
                       child: Center(
                         child: Icon(
                           Iconsax.color_swatch,
-                          color: color,
+                          color: _getTextColor(color),
                         ),
                       ),
                     ),
@@ -229,10 +243,16 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 },
               ),
             ),
+          const SizedBox(height: 20,),
           ],
         ),
       ),
     );
+  }
+
+  Color _getTextColor(Color backgroundColor) {
+    final brightness = backgroundColor.computeLuminance();
+    return brightness > 0.5 ? Colors.black : Colors.white;
   }
 
   @override
