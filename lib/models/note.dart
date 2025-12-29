@@ -58,4 +58,23 @@ class Note extends HiveObject {
     this.content = content ?? this.content;
     updatedAt = DateTime.now();
   }
+
+
+  bool get hasLinks {
+    final urlRegex = RegExp(
+      r'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)',
+      caseSensitive: false,
+      multiLine: false,
+    );
+    return urlRegex.hasMatch(content);
+  }
+
+  List<String> get extractedLinks {
+    final urlRegex = RegExp(
+      r'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)',
+      caseSensitive: false,
+      multiLine: false,
+    );
+    return urlRegex.allMatches(content).map((match) => match.group(0)!).toList();
+  }
 }

@@ -24,6 +24,9 @@ class Settings {
   @HiveField(6)
   bool defaultGridView;
 
+  @HiveField(7)  
+  bool openWithSearchBar;  
+
   Settings({
     this.displayRichLinks = true,
     this.addItemToBottom = false,
@@ -32,5 +35,6 @@ class Settings {
     this.enableFullScreen = true,
     this.defaultSortOption = SortOption.dateUpdated,
     this.defaultGridView = false,
+    this.openWithSearchBar = false,  
   });
 }

@@ -1,12 +1,10 @@
 import 'package:fast_note/theme/app_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:fast_note/services/hive_service.dart';
 import 'package:fast_note/screens/home_screen.dart';
 import 'package:fast_note/providers/theme_provider.dart';
 import 'package:fast_note/providers/settings_provider.dart';
-import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
