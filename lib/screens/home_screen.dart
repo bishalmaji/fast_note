@@ -378,15 +378,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Consumer<SettingsProvider>(
       builder: (context, settingsProvider, child) {
         final isGridView = settingsProvider.settings.defaultGridView;
-        final shouldFocusSearch = settingsProvider.settings.openWithSearchBar;
-
-        if (shouldFocusSearch && !_searchFocusNode.hasFocus) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted && _searchFocusNode.canRequestFocus) {
-              _searchFocusNode.requestFocus();
-            }
-          });
-        }
+     
         return Scaffold(
           backgroundColor: theme.colorScheme.background,
           appBar: AppBar(
