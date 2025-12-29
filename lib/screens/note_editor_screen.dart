@@ -297,13 +297,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   border: Border.all(
                     color: _titleFocusNode.hasFocus
                         ? theme.colorScheme.primary
-                        : theme.colorScheme.outline.withOpacity(0.2),
+                        : theme.colorScheme.outline.withValues(alpha:0.2),
                     width: _titleFocusNode.hasFocus ? 2 : 1,
                   ),
                   boxShadow: _titleFocusNode.hasFocus
                       ? [
                           BoxShadow(
-                            color: theme.colorScheme.primary.withOpacity(0.1),
+                            color: theme.colorScheme.primary.withValues(alpha:0.1),
                             blurRadius: 8,
                             spreadRadius: 2,
                             offset: const Offset(0, 2),
@@ -324,7 +324,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                     decoration: InputDecoration(
                       hintText: 'Title',
                       hintStyle: theme.textTheme.titleLarge?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.4),
+                        color: theme.colorScheme.onSurface.withValues(alpha:0.4),
                         fontWeight: FontWeight.w400,
                         fontSize: 22,
                       ),
@@ -355,13 +355,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                     border: Border.all(
                       color: _contentFocusNode.hasFocus
                           ? theme.colorScheme.primary
-                          : theme.colorScheme.outline.withOpacity(0.2),
+                          : theme.colorScheme.outline.withValues(alpha:0.2),
                       width: _contentFocusNode.hasFocus ? 2 : 1,
                     ),
                     boxShadow: _contentFocusNode.hasFocus
                         ? [
                             BoxShadow(
-                              color: theme.colorScheme.primary.withOpacity(0.1),
+                              color: theme.colorScheme.primary.withValues(alpha:0.1),
                               blurRadius: 8,
                               spreadRadius: 2,
                               offset: const Offset(0, 2),
@@ -382,7 +382,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       decoration: InputDecoration(
                         hintText: 'Start typing your note...',
                         hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.4),
+                          color: theme.colorScheme.onSurface.withValues(alpha:0.4),
                           fontSize: 16,
                           height: 1.6,
                         ),
@@ -414,7 +414,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 'Note Color',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: theme.colorScheme.onSurface.withValues(alpha:0.7),
                 ),
               ),
               const SizedBox(height: 12),
@@ -483,13 +483,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           border: Border.all(
             color: isSelected
                 ? theme.colorScheme.primary
-                : theme.colorScheme.outline.withOpacity(0.3),
+                : theme.colorScheme.outline.withValues(alpha:0.3),
             width: isSelected ? 3 : 1.5,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: theme.colorScheme.primary.withOpacity(0.3),
+                    color: theme.colorScheme.primary.withValues(alpha:0.3),
                     blurRadius: 8,
                     spreadRadius: 2,
                   ),
@@ -528,7 +528,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       width: 48,
       height: 48,
       child: Material(
-        color: theme.colorScheme.surface.withOpacity(0.7),
+        color: theme.colorScheme.surface.withValues(alpha:0.7),
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           borderRadius: BorderRadius.circular(12),

@@ -48,12 +48,12 @@ Widget build(BuildContext context) {
         color: noteColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.2),
+          color: theme.colorScheme.outline.withValues(alpha:0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha:0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -90,7 +90,7 @@ Widget build(BuildContext context) {
                     note.previewContent,
                     style: theme.textTheme.bodyMedium!.copyWith(
                       fontSize: isGrid ? 12 : 14,
-                      color: textColor.withOpacity(0.8),
+                      color: textColor.withValues(alpha:0.8),
                     ),
                     maxLines: isGrid ? 4 : 6,
                     overflow: TextOverflow.ellipsis,
@@ -104,7 +104,7 @@ Widget build(BuildContext context) {
                         DateFormat('MMM dd, yyyy').format(note.updatedAt),
                         style: theme.textTheme.bodySmall!.copyWith(
                           fontSize: 11,
-                          color: textColor.withOpacity(0.6),
+                          color: textColor.withValues(alpha:0.6),
                         ),
                       ),
                     ),
@@ -113,7 +113,7 @@ Widget build(BuildContext context) {
                       Icon(
                         Iconsax.link,
                         size: 14,
-                        color: textColor.withOpacity(0.7),
+                        color: textColor.withValues(alpha:0.7),
                       ),
                   ],
                 ),
