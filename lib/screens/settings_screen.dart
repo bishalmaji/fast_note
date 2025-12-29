@@ -163,7 +163,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.1),
+          color: theme.colorScheme.outline.withValues(alpha:0.1),
         ),
       ),
       child: Column(
@@ -175,7 +175,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.1),
+                color: theme.colorScheme.primary.withValues(alpha:0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(Iconsax.sun, color: Colors.amber, size: 20),
@@ -184,7 +184,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: Text(
               _getThemeModeText(settingsProvider.settings.themeMode),
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha:0.6),
               ),
             ),
           ),
@@ -253,13 +253,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
-              ? theme.colorScheme.primary.withOpacity(0.1)
+              ? theme.colorScheme.primary.withValues(alpha:0.1)
               : theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSelected
                 ? theme.colorScheme.primary
-                : theme.colorScheme.outline.withOpacity(0.1),
+                : theme.colorScheme.outline.withValues(alpha:0.1),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -292,7 +292,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.1),
+          color: theme.colorScheme.outline.withValues(alpha:0.1),
         ),
       ),
       child: ListTile(
@@ -302,7 +302,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: theme.colorScheme.primary.withOpacity(0.1),
+            color: theme.colorScheme.primary.withValues(alpha:0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: const Icon(Iconsax.sort, color: Colors.purple, size: 20),
@@ -311,7 +311,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         subtitle: Text(
           _getSortOptionName(settingsProvider.settings.defaultSortOption),
           style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha:0.6),
           ),
         ),
         trailing: const Icon(Iconsax.arrow_right_3, size: 20),
@@ -349,7 +349,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.1),
+          color: theme.colorScheme.outline.withValues(alpha:0.1),
         ),
       ),
       child: SwitchListTile(
@@ -358,7 +358,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: theme.colorScheme.primary.withOpacity(0.1),
+            color: theme.colorScheme.primary.withValues(alpha:0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: theme.colorScheme.primary, size: 20),
@@ -367,7 +367,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         subtitle: Text(
           subtitle,
           style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha:0.6),
           ),
         ),
         value: value,
@@ -409,7 +409,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             Divider(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+              color: Theme.of(context).colorScheme.outline.withValues(alpha:0.2),
               height: 1,
             ),
             ...SortOption.values.map((option) {
@@ -427,7 +427,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           : Theme.of(context)
                               .colorScheme
                               .outline
-                              .withOpacity(0.3),
+                              .withValues(alpha:0.3),
                       width: 2,
                     ),
                   ),
@@ -546,7 +546,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Text('Cancel',
                 style: TextStyle(
                   color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      Theme.of(context).colorScheme.onSurface.withValues(alpha:0.6),
                 )),
           ),
           TextButton(

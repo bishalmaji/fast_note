@@ -193,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Divider(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+              color: Theme.of(context).colorScheme.outline.withValues(alpha:0.2),
               height: 1,
             ),
             ...SortOption.values.map((option) {
@@ -210,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           : Theme.of(context)
                               .colorScheme
                               .outline
-                              .withOpacity(0.3),
+                              .withValues(alpha:0.3),
                       width: 2,
                     ),
                   ),
@@ -382,7 +382,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return Scaffold(
           backgroundColor: theme.colorScheme.background,
           appBar: AppBar(
-            title: Text('Modern Notes',
+            title: Text('Fast Notes',
                 style: theme.textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.w600,
                 )),
@@ -432,14 +432,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           border: Border.all(
                             color: _isSearchFocused
                                 ? theme.colorScheme.primary
-                                : theme.colorScheme.outline.withOpacity(0.2),
+                                : theme.colorScheme.outline.withValues(alpha:0.2),
                             width: _isSearchFocused ? 2 : 1,
                           ),
                           boxShadow: _isSearchFocused
                               ? [
                                   BoxShadow(
                                     color: theme.colorScheme.primary
-                                        .withOpacity(0.1),
+                                        .withValues(alpha:0.1),
                                     blurRadius: 8,
                                     spreadRadius: 2,
                                     offset: const Offset(0, 2),
@@ -456,7 +456,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: _isSearchFocused
                                   ? theme.colorScheme.primary
                                   : theme.colorScheme.onSurface
-                                      .withOpacity(0.5),
+                                      .withValues(alpha:0.5),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
@@ -475,7 +475,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   hintStyle:
                                       theme.textTheme.bodyMedium?.copyWith(
                                     color: theme.colorScheme.onSurface
-                                        .withOpacity(0.5),
+                                        .withValues(alpha:0.5),
                                   ),
                                   border: InputBorder.none,
                                   focusedBorder: InputBorder.none,
@@ -495,7 +495,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Iconsax.close_circle,
                                   size: 20,
                                   color: theme.colorScheme.onSurface
-                                      .withOpacity(0.5),
+                                      .withValues(alpha:0.5),
                                 ),
                                 onTap: () {
                                   _searchController.clear();
@@ -511,7 +511,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Iconsax.add_circle,
                                   size: 20,
                                   color: theme.colorScheme.onSurface
-                                      .withOpacity(0.5),
+                                      .withValues(alpha:0.5),
                                 ),
                                 onTap: () {
                                   _handleSearchSubmit(searchQuery);
@@ -529,7 +529,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: theme.colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: theme.colorScheme.outline.withOpacity(0.2),
+                          color: theme.colorScheme.outline.withValues(alpha:0.2),
                           width: 1,
                         ),
                       ),
@@ -547,7 +547,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: theme.colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: theme.colorScheme.outline.withOpacity(0.2),
+                          color: theme.colorScheme.outline.withValues(alpha:0.2),
                           width: 1,
                         ),
                       ),
@@ -575,7 +575,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   : Iconsax.search_normal,
                               size: 64,
                               color:
-                                  theme.colorScheme.onSurface.withOpacity(0.3),
+                                  theme.colorScheme.onSurface.withValues(alpha:0.3),
                             ),
                             const SizedBox(height: 16),
                             Text(
@@ -585,7 +585,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               textAlign: TextAlign.center,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: theme.colorScheme.onSurface
-                                    .withOpacity(0.5),
+                                    .withValues(alpha:0.5),
                               ),
                             ),
                           ],
