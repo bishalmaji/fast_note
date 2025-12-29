@@ -16,6 +16,7 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       enableFullScreen: reader.readBool(),
       defaultSortOption: SortOption.values[reader.readInt()],
       defaultGridView: reader.readBool(),
+      openWithSearchBar: reader.readBool(), 
     );
   }
 
@@ -28,5 +29,6 @@ class SettingsAdapter extends TypeAdapter<Settings> {
     writer.writeBool(obj.enableFullScreen);
     writer.writeInt(obj.defaultSortOption.index);
     writer.writeBool(obj.defaultGridView);
+    writer.writeBool(obj.openWithSearchBar);  
   }
 }

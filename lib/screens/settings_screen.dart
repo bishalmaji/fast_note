@@ -20,13 +20,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final settings = settingsProvider.settings;
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.background,
       appBar: AppBar(
-        title: Text('Settings', style: theme.textTheme.bodyLarge?.copyWith(
-          fontWeight: FontWeight.w600,
-        )),
+        title: Text('Settings',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+            )),
         leading: IconButton(
           icon: const Icon(Iconsax.arrow_left_2),
           onPressed: () => Navigator.pop(context),
@@ -54,10 +55,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: settings.addItemToBottom,
               onChanged: (value) => settingsProvider.toggleAddToBottom(value),
             ),
-            
+
             _buildSectionHeader('Appearance', theme),
             _buildThemeSelector(themeProvider, settingsProvider),
-                        _buildSectionHeader('Features', theme),
+            _buildSectionHeader('Features', theme),
             _buildSettingSwitch(
               context: context,
               icon: Iconsax.share,
@@ -74,7 +75,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: settings.enableFullScreen,
               onChanged: (value) => settingsProvider.toggleFullScreen(value),
             ),
-            
+            _buildSettingSwitch(
+              context: context,
+              icon: Iconsax.search_normal_1,
+              title: 'Open with Search Focus',
+              subtitle: 'Automatically focus search bar when app opens',
+              value: settings.openWithSearchBar,
+              onChanged: (value) =>
+                  settingsProvider.toggleOpenWithSearchBar(value),
+            ),
+
             _buildSectionHeader('Default View', theme),
             _buildDefaultSortSelector(settingsProvider, theme),
             _buildSettingSwitch(
@@ -83,12 +93,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: 'Default Grid View',
               subtitle: 'Open app in grid view by default',
               value: settings.defaultGridView,
-              onChanged: (value) {
-                settings.defaultGridView = value;
-                settingsProvider.updateSettings(settings);
+              onChanged: (value) async {
+                await settingsProvider.updateDefaultGridView(value);
               },
             ),
-            
             _buildSectionHeader('About', theme),
             ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 0),
@@ -99,23 +107,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   color: theme.colorScheme.primary,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Iconsax.info_circle, color: Colors.white, size: 24),
+                child: const Icon(Iconsax.info_circle,
+                    color: Colors.white, size: 24),
               ),
               title: Text('App Version', style: theme.textTheme.bodyMedium),
               subtitle: const Text('1.0.0'),
               trailing: const Icon(Iconsax.arrow_right_3, size: 20),
               onTap: () => _showAboutDialog(context),
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             Center(
               child: OutlinedButton(
-                onPressed: () => _showResetConfirmation(context, settingsProvider),
+                onPressed: () =>
+                    _showResetConfirmation(context, settingsProvider),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.red,
                   side: const BorderSide(color: Colors.red),
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -128,7 +139,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-  
+
   Widget _buildSectionHeader(String title, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.only(top: 24, bottom: 12, left: 4),
@@ -141,53 +152,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-  
-  Widget _buildSettingSwitch({
-    required BuildContext context,
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
+
+  Widget _buildThemeSelector(
+      ThemeProvider themeProvider, SettingsProvider settingsProvider) {
     final theme = Theme.of(context);
-    
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.1),
-        ),
-      ),
-      child: SwitchListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        secondary: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: theme.colorScheme.primary.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, color: theme.colorScheme.primary, size: 20),
-        ),
-        title: Text(title, style: theme.textTheme.bodyMedium),
-        subtitle: Text(subtitle, 
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
-          ),
-        ),
-        value: value,
-        onChanged: onChanged,
-        activeColor: theme.colorScheme.primary,
-      ),
-    );
-  }
-  
-  Widget _buildThemeSelector(ThemeProvider themeProvider, SettingsProvider settingsProvider) {
-    final theme = Theme.of(context);
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -200,7 +169,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         children: [
           ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             leading: Container(
               width: 40,
               height: 40,
@@ -261,7 +231,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-  
+
   Widget _buildThemeOption(
     String title,
     String value,
@@ -271,7 +241,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required Color iconColor,
   }) {
     final isSelected = settingsProvider.settings.themeMode == value;
-    
+
     return GestureDetector(
       onTap: () async {
         settingsProvider.settings.themeMode = value;
@@ -282,27 +252,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected 
-            ? theme.colorScheme.primary.withOpacity(0.1)
-            : theme.colorScheme.surface,
+          color: isSelected
+              ? theme.colorScheme.primary.withOpacity(0.1)
+              : theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSelected
-              ? theme.colorScheme.primary
-              : theme.colorScheme.outline.withOpacity(0.1),
+                ? theme.colorScheme.primary
+                : theme.colorScheme.outline.withOpacity(0.1),
             width: isSelected ? 2 : 1,
           ),
         ),
         child: Column(
           children: [
-            Icon(icon, color: isSelected ? theme.colorScheme.primary : iconColor, size: 20),
+            Icon(icon,
+                color: isSelected ? theme.colorScheme.primary : iconColor,
+                size: 20),
             const SizedBox(height: 4),
             Text(
               title,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: isSelected 
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurface,
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
@@ -311,8 +283,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-  
-  Widget _buildDefaultSortSelector(SettingsProvider settingsProvider, ThemeData theme) {
+
+  Widget _buildDefaultSortSelector(
+      SettingsProvider settingsProvider, ThemeData theme) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -323,7 +296,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         leading: Container(
           width: 40,
           height: 40,
@@ -345,7 +319,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-  
+
   String _getThemeModeText(String themeMode) {
     switch (themeMode) {
       case 'light':
@@ -358,7 +332,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return 'Follow System';
     }
   }
-  
+
+  Widget _buildSettingSwitch({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    final theme = Theme.of(context);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.outline.withOpacity(0.1),
+        ),
+      ),
+      child: SwitchListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        secondary: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: theme.colorScheme.primary, size: 20),
+        ),
+        title: Text(title, style: theme.textTheme.bodyMedium),
+        subtitle: Text(
+          subtitle,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurface.withOpacity(0.6),
+          ),
+        ),
+        value: value,
+        onChanged: onChanged,
+        activeColor: theme.colorScheme.primary,
+      ),
+    );
+  }
+
   String _getSortOptionName(SortOption option) {
     switch (option) {
       case SortOption.dateUpdated:
@@ -367,11 +385,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return 'Date Created';
       case SortOption.title:
         return 'Title (A-Z)';
-      default:
-        return 'Last Updated';
     }
   }
-  
+
   void _showSortOptionsDialog(SettingsProvider settingsProvider) {
     showModalBottomSheet(
       context: context,
@@ -388,8 +404,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Text(
                 'Default Sort By',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                      fontWeight: FontWeight.w600,
+                    ),
               ),
             ),
             Divider(
@@ -397,7 +413,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               height: 1,
             ),
             ...SortOption.values.map((option) {
-              final isSelected = settingsProvider.settings.defaultSortOption == option;
+              final isSelected =
+                  settingsProvider.settings.defaultSortOption == option;
               return ListTile(
                 leading: Container(
                   width: 24,
@@ -405,39 +422,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isSelected 
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context)
+                              .colorScheme
+                              .outline
+                              .withOpacity(0.3),
                       width: 2,
                     ),
                   ),
-                  child: isSelected ? Center(
-                    child: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ) : null,
+                  child: isSelected
+                      ? Center(
+                          child: Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        )
+                      : null,
                 ),
                 title: Text(
                   _getSortOptionName(option),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  ),
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
+                      ),
                 ),
-                trailing: isSelected 
-                  ? Icon(
-                      Iconsax.tick_circle,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 20,
-                    )
-                  : null,
-                onTap: () {
-                  settingsProvider.settings.defaultSortOption = option;
-                  settingsProvider.updateSettings(settingsProvider.settings);
+                trailing: isSelected
+                    ? Icon(
+                        Iconsax.tick_circle,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 20,
+                      )
+                    : null,
+                onTap: () async {
+                  await settingsProvider.updateDefaultSortOption(option);
                   Navigator.pop(context);
                 },
               );
@@ -448,13 +470,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       },
     );
   }
-  
+
   void _showAboutDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Text('About Fast Note', style: Theme.of(context).textTheme.bodyLarge),
+        title: Text('About Fast Note',
+            style: Theme.of(context).textTheme.bodyLarge),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -472,8 +495,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Text(
               'Features:',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
             const SizedBox(height: 8),
             _buildFeatureItem('Rich text notes with colors'),
@@ -492,34 +515,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-  
+
   Widget _buildFeatureItem(String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
-          Icon(Iconsax.tick_circle, size: 16, color: Theme.of(context).colorScheme.primary),
+          Icon(Iconsax.tick_circle,
+              size: 16, color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 8),
           Text(text, style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
     );
   }
-  
-  void _showResetConfirmation(BuildContext context, SettingsProvider settingsProvider) {
+
+  void _showResetConfirmation(
+      BuildContext context, SettingsProvider settingsProvider) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Text('Reset Settings?', style: Theme.of(context).textTheme.bodyLarge),
-        content: Text('All settings will be restored to default values.', 
-          style: Theme.of(context).textTheme.bodyMedium),
+        title: Text('Reset Settings?',
+            style: Theme.of(context).textTheme.bodyLarge),
+        content: Text('All settings will be restored to default values.',
+            style: Theme.of(context).textTheme.bodyMedium),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-            )),
+            child: Text('Cancel',
+                style: TextStyle(
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                )),
           ),
           TextButton(
             onPressed: () {
