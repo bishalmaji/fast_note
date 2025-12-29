@@ -16,11 +16,6 @@ class SettingsProvider extends ChangeNotifier {
 Future<void> _loadSettings() async {
   _settings = HiveService.getSettings();
   
-  if (_settings.openWithSearchBar == null) {
-    _settings.openWithSearchBar = false;
-    await updateSettings(_settings);
-  }
-  
   await _applyFullScreenMode();
   notifyListeners();
 }
